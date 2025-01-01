@@ -3,7 +3,25 @@
 #include <ESP8266WiFi.h>
 #include <espnow.h>
 
-const int bat = 13;
+const int rightMotor1 = 12;
+const int rightMotor2 = 13;
+const int leftMotor1 = 1;
+const int leftMotor2 = 3;
+
+const int activeBuzzer = 15;
+const int blueLed = 5;
+const int redLed = 16;
+
+int outputPin[] = {
+    rightMotor1,
+    rightMotor2,
+    leftMotor1,
+    leftMotor2,
+    activeBuzzer,
+    blueLed,
+    redLed};
+
+const int waterSensor = 4;
 
 unsigned long lastTime = 0;
 unsigned long timerDelay = 1000; // send readings timer
@@ -33,23 +51,22 @@ void OnDataRecv(uint8_t *mac, uint8_t *incomingData, uint8_t len)
     memcpy(&myData, incomingData, sizeof(myData));
     Serial.print("Bytes received: ");
     Serial.println(len);
-/*     Serial.print("white:");
-    Serial.println(myData.white);
-    Serial.print("red:");
-    Serial.println(myData.red);
-    Serial.print("yellow:");
-    Serial.println(myData.yellow);
-    Serial.print("orange:");
-    Serial.println(myData.orange);
-    Serial.print("joy:");
-    Serial.println(myData.joy);
-    Serial.print("x:");
-    Serial.println(myData.x);
-    Serial.print("y:");
-    Serial.println(myData.y);
-    Serial.println(); */
+    /*     Serial.print("white:");
+        Serial.println(myData.white);
+        Serial.print("red:");
+        Serial.println(myData.red);
+        Serial.print("yellow:");
+        Serial.println(myData.yellow);
+        Serial.print("orange:");
+        Serial.println(myData.orange);
+        Serial.print("joy:");
+        Serial.println(myData.joy);
+        Serial.print("x:");
+        Serial.println(myData.x);
+        Serial.print("y:");
+        Serial.println(myData.y);
+        Serial.println(); */
 }
-
 
 void OnDataSent(uint8_t *mac_addr, uint8_t sendStatus)
 {
@@ -66,11 +83,9 @@ void OnDataSent(uint8_t *mac_addr, uint8_t sendStatus)
     }
 }
 
-
 void setup()
 {
     Serial.begin(9600);
-    pinMode(bat, INPUT);
     // Set device as a Wi-Fi Station
     WiFi.mode(WIFI_STA);
     if (esp_now_init() != 0)
@@ -89,8 +104,6 @@ void loop()
     if ((millis() - lastTime) > timerDelay)
     {
         // Set values to send
-        shipData.battery = digitalRead(bat);
-        shipData.temp = 1;
         // Send message via ESP-NOW
         esp_now_send(broadcastAddress, (uint8_t *)&shipData, sizeof(shipData));
         lastTime = millis(); // プログラム実行から経過した時間
