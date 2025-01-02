@@ -26,12 +26,23 @@ const int waterSensor = 4;
 unsigned long lastTime = 0;
 unsigned long timerDelay = 1000; // send readings timer
 
+void gpioSetup()
+{
+    for (int i = 0; 0 <= 6; i += 1)
+    {
+        pinMode(outputPin[i], OUTPUT);
+        digitalWrite(outputPin[i], 0);
+    }
+
+    pinMode(waterSensor, INPUT);
+}
+
 typedef struct struct_message
 {
-    int white;
-    int red;
-    int yellow;
-    int orange;
+    int up;
+    int down;
+    int right;
+    int left;
     int Onled;
     int buzzer;
     int battery;
@@ -39,8 +50,8 @@ typedef struct struct_message
     int water;
 } struct_message;
 
-// Create a struct_message called myData
-struct_message myData;
+// Create a struct_message called controllerData
+struct_message controllerData;
 struct_message shipData;
 
 // REPLACE WITH THE MAC Address of your receiver
@@ -48,49 +59,46 @@ uint8_t broadcastAddress[] = {0x30, 0x83, 0x98, 0xE4, 0xAF, 0x60};
 
 void OnDataRecv(uint8_t *mac, uint8_t *incomingData, uint8_t len)
 {
-    memcpy(&myData, incomingData, sizeof(myData));
-    Serial.print("Bytes received: ");
-    Serial.println(len);
-    /*     Serial.print("white:");
-        Serial.println(myData.white);
+    memcpy(&controllerData, incomingData, sizeof(controllerData));
+    // Serial.print("Bytes received: ");
+    // Serial.println(len);
+    /*     Serial.print("up:");
+        Serial.println(controllerData.up);
         Serial.print("red:");
-        Serial.println(myData.red);
+        Serial.println(controllerData.down);
         Serial.print("yellow:");
-        Serial.println(myData.yellow);
+        Serial.println(controllerData.right);
         Serial.print("orange:");
-        Serial.println(myData.orange);
-        Serial.print("joy:");
-        Serial.println(myData.joy);
-        Serial.print("x:");
-        Serial.println(myData.x);
-        Serial.print("y:");
-        Serial.println(myData.y);
-        Serial.println(); */
+        Serial.println(controllerData.left);
+ */
 }
 
 void OnDataSent(uint8_t *mac_addr, uint8_t sendStatus)
 {
-    Serial.print("Last Packet Send Status: ");
+    // Serial.print("Last Packet Send Status: ");
     if (sendStatus == 0)
     {
-        Serial.println("Delivery success");
-        Serial.println(shipData.battery);
+        // Serial.println("Delivery success");
+        digitalWrite(redLed, 1);
+        digitalWrite(blueLed, 0);
     }
     else
     {
-        Serial.println("Delivery fail");
-        Serial.println(shipData.battery);
+        // Serial.println("Delivery fail");
+        digitalWrite(redLed, 0);
+        digitalWrite(blueLed, 1);
     }
 }
 
 void setup()
 {
-    Serial.begin(9600);
+    // Serial.begin(9600);
+    gpioSetup();
     // Set device as a Wi-Fi Station
     WiFi.mode(WIFI_STA);
     if (esp_now_init() != 0)
     {
-        Serial.println("Error initializing ESP-NOW");
+        // Serial.println("Error initializing ESP-NOW");
         return;
     }
     esp_now_set_self_role(ESP_NOW_ROLE_COMBO);
