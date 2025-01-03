@@ -43,10 +43,9 @@ typedef struct struct_message
     int down;
     int right;
     int left;
-    int Onled;
     int buzzer;
-    int battery;
     int temp;
+    int battery;
     int water;
 } struct_message;
 
