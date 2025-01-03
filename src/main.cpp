@@ -12,15 +12,6 @@ const int activeBuzzer = 15;
 const int blueLed = 5;
 const int redLed = 16;
 
-int outputPin[] = {
-    rightMotor1,
-    rightMotor2,
-    leftMotor1,
-    leftMotor2,
-    activeBuzzer,
-    blueLed,
-    redLed};
-
 const int waterSensor = 4;
 
 unsigned long lastTime = 0;
@@ -28,13 +19,26 @@ unsigned long timerDelay = 1000; // send readings timer
 
 void gpioSetup()
 {
-    for (int i = 0; 0 <= 6; i += 1)
-    {
-        pinMode(outputPin[i], OUTPUT);
-        digitalWrite(outputPin[i], 0);
-    }
-
+    pinMode(rightMotor1, OUTPUT);
+    pinMode(rightMotor2, OUTPUT);
+    pinMode(leftMotor1, OUTPUT);
+    pinMode(leftMotor2, OUTPUT);
+    pinMode(activeBuzzer, OUTPUT);
+    pinMode(blueLed, OUTPUT);
+    pinMode(redLed, OUTPUT);
     pinMode(waterSensor, INPUT);
+}
+
+void inputData()
+{
+    shipData.up = 1;
+    shipData.down = 1;
+    shipData.right = 1;
+    shipData.left = 1;
+    shipData.buzzer = 1;
+    shipData.temp = 1;
+    shipData.battery = 1;
+    shipData.water = 1;
 }
 
 typedef struct struct_message
@@ -59,17 +63,6 @@ uint8_t broadcastAddress[] = {0x30, 0x83, 0x98, 0xE4, 0xAF, 0x60};
 void OnDataRecv(uint8_t *mac, uint8_t *incomingData, uint8_t len)
 {
     memcpy(&controllerData, incomingData, sizeof(controllerData));
-    // Serial.print("Bytes received: ");
-    // Serial.println(len);
-    /*     Serial.print("up:");
-        Serial.println(controllerData.up);
-        Serial.print("red:");
-        Serial.println(controllerData.down);
-        Serial.print("yellow:");
-        Serial.println(controllerData.right);
-        Serial.print("orange:");
-        Serial.println(controllerData.left);
- */
 }
 
 void OnDataSent(uint8_t *mac_addr, uint8_t sendStatus)
@@ -78,21 +71,23 @@ void OnDataSent(uint8_t *mac_addr, uint8_t sendStatus)
     if (sendStatus == 0)
     {
         // Serial.println("Delivery success");
-        digitalWrite(redLed, 1);
-        digitalWrite(blueLed, 0);
+        digitalWrite(redLed, 0);
+        digitalWrite(blueLed, 1);
     }
     else
     {
         // Serial.println("Delivery fail");
-        digitalWrite(redLed, 0);
-        digitalWrite(blueLed, 1);
+        digitalWrite(redLed, 1);
+        digitalWrite(blueLed, 0);
     }
 }
 
 void setup()
 {
     // Serial.begin(9600);
-    gpioSetup();
+    // gpioSetup();
+    pinMode(redLed, OUTPUT);
+    pinMode(blueLed, OUTPUT);
     // Set device as a Wi-Fi Station
     WiFi.mode(WIFI_STA);
     if (esp_now_init() != 0)
@@ -110,6 +105,7 @@ void loop()
 {
     if ((millis() - lastTime) > timerDelay)
     {
+        // digitalWrite(redLed, 1);
         // Set values to send
         // Send message via ESP-NOW
         esp_now_send(broadcastAddress, (uint8_t *)&shipData, sizeof(shipData));
