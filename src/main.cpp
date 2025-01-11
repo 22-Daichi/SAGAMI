@@ -28,7 +28,12 @@ const int waterSensor = 4;
 int16_t ax, ay, az, gx, gy, gz, Temp;
 
 unsigned long lastTime = 0;
-unsigned long timerDelay = 100; // send readings timer
+unsigned long timerDelay = 50; // send readings timer
+
+int rightMotorPower = 0;
+int leftMotorPower = 0;
+int accel = 4;
+int maximumPower = 200;
 
 void gpioSetup()
 {
@@ -128,8 +133,93 @@ void fireBuzzer()
     }
 }
 
+void motorPower()
+{
+    if (controllerData.up == 0)
+    {
+        rightMotorPower += accel;
+        leftMotorPower += accel; // 約3秒後に最大
+    }
+    if (controllerData.down == 0)
+    {
+        if(rightMotorPower > 0 || leftMotorPower > 0){// 前進or取り舵or面舵
+            rightMotorPower = 0;
+            leftMotorPower = 0;
+        }
+        rightMotorPower -= accel;
+        leftMotorPower -= accel;
+    }
+    if (controllerData.right == 0)
+    {
+        rightMotorPower -= accel;
+        leftMotorPower += accel;
+    }
+    if (controllerData.left == 0)
+    {
+        rightMotorPower += accel;
+        leftMotorPower -= accel;
+    }
+    if (controllerData.up * controllerData.down * controllerData.left * controllerData.right == 1)
+    {
+        if (rightMotorPower > 0)
+        {
+            rightMotorPower -= accel/2 ;
+        }
+        else if (rightMotorPower < 0)
+        {
+            rightMotorPower += accel / 2;
+        }
+        if (leftMotorPower > 0)
+        {
+            leftMotorPower -= accel/2;
+        }
+        else if (leftMotorPower < 0)
+        {
+            leftMotorPower += accel/2;
+        }
+    }
+
+    if (rightMotorPower > maximumPower)
+    {
+        rightMotorPower = maximumPower;
+    }
+    if (rightMotorPower < -maximumPower)
+    {
+        rightMotorPower = -maximumPower;
+    }
+    if (leftMotorPower > maximumPower)
+    {
+        leftMotorPower = maximumPower;
+    }
+    if (leftMotorPower < -maximumPower)
+    {
+        leftMotorPower = -maximumPower;
+    }
+    if (rightMotorPower >= 0)
+    {
+        analogWrite(rightMotor1, rightMotorPower);
+        analogWrite(rightMotor2, 0);
+    }
+    else
+    {
+        analogWrite(rightMotor1, 0);
+        analogWrite(rightMotor2, rightMotorPower * (-1));
+    }
+    if (leftMotorPower >= 0)
+    {
+        analogWrite(leftMotor1, leftMotorPower);
+        analogWrite(leftMotor2, 0);
+    }
+    else
+    {
+        analogWrite(leftMotor1, 0);
+        analogWrite(leftMotor2, leftMotorPower * (-1));
+    }
+}
+
 void setup()
 {
+    analogWriteFreq(20000);
     gpioSetup();
     // Set device as a Wi-Fi Station
     WiFi.mode(WIFI_STA);
@@ -156,7 +246,7 @@ void loop()
     if ((millis() - lastTime) > timerDelay)
     {
         fireBuzzer();
-
+        motorPower();
         // ここから送信用
         getGy521Value();
         inputData();
