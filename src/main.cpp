@@ -142,7 +142,8 @@ void motorPower()
     }
     if (controllerData.down == 0)
     {
-        if(rightMotorPower > 0 || leftMotorPower > 0){// 前進or取り舵or面舵
+        if (rightMotorPower > 0 || leftMotorPower > 0)
+        { // 前進or取り舵or面舵
             rightMotorPower = 0;
             leftMotorPower = 0;
         }
@@ -163,7 +164,7 @@ void motorPower()
     {
         if (rightMotorPower > 0)
         {
-            rightMotorPower -= accel/2 ;
+            rightMotorPower -= accel / 2;
         }
         else if (rightMotorPower < 0)
         {
@@ -171,11 +172,11 @@ void motorPower()
         }
         if (leftMotorPower > 0)
         {
-            leftMotorPower -= accel/2;
+            leftMotorPower -= accel / 2;
         }
         else if (leftMotorPower < 0)
         {
-            leftMotorPower += accel/2;
+            leftMotorPower += accel / 2;
         }
     }
 
@@ -195,6 +196,9 @@ void motorPower()
     {
         leftMotorPower = -maximumPower;
     }
+}
+void motorDrive()
+{
     if (rightMotorPower >= 0)
     {
         analogWrite(rightMotor1, rightMotorPower);
@@ -246,7 +250,9 @@ void loop()
     if ((millis() - lastTime) > timerDelay)
     {
         fireBuzzer();
-        motorPower();
+        motorPower(); // モーターの出力決定
+        // たとえばここにimuからの値をもとにパラメーターを調整
+        motorDrive(); // ここで出力
         // ここから送信用
         getGy521Value();
         inputData();
