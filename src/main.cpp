@@ -162,7 +162,7 @@ void motorPower()
     }
     if (controllerData.up * controllerData.down * controllerData.left * controllerData.right == 1)
     {
-        if (rightMotorPower > 0)
+/*         if (rightMotorPower > 0)
         {
             rightMotorPower -= accel / 2;
         }
@@ -177,7 +177,9 @@ void motorPower()
         else if (leftMotorPower < 0)
         {
             leftMotorPower += accel / 2;
-        }
+        } */
+       rightMotorPower = 0;
+       leftMotorPower = 0;
     }
 
     if (rightMotorPower > maximumPower)
@@ -223,7 +225,7 @@ void motorDrive()
 
 void setup()
 {
-    analogWriteFreq(20000);
+    analogWriteFreq(30000);
     gpioSetup();
     // Set device as a Wi-Fi Station
     WiFi.mode(WIFI_STA);
