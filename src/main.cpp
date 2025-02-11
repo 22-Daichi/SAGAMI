@@ -136,6 +136,7 @@ void fireBuzzer()
 
 void motorPower()
 {
+    maximumPower = 165800/shipData.battery;
     if (controllerData.up == 0)
     {
         rightMotorPower += accel;
@@ -226,11 +227,11 @@ void motorDrive()
 
 void controllPower()
 {
-    if (rightMotorPower > 0)
+    if (rightMotorPower > 50)
     {
         rightMotorPower += 10;
     }
-    if (rightMotorPower < 0)
+    if (rightMotorPower < -50)
     {
         rightMotorPower -= 10;
     }
@@ -275,14 +276,14 @@ void loop()
 {
     if ((millis() - lastTime) > timerDelay)
     {
+        getGy521Value();
+        inputData();
         fireBuzzer();
         motorPower(); // モーターの出力決定
         controllPower();
         // たとえばここにimuからの値をもとにパラメーターを調整
         motorDrive(); // ここで出力
         // ここから送信用
-        getGy521Value();
-        inputData();
         esp_now_send(broadcastAddress, (uint8_t *)&shipData, sizeof(shipData));
         // ここまで
         lastTime = millis(); // プログラム実行から経過した時間
