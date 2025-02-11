@@ -34,6 +34,7 @@ int rightMotorPower = 0;
 int leftMotorPower = 0;
 int accel = 4;
 int maximumPower = 200;
+int mode = 0;
 
 void gpioSetup()
 {
@@ -162,24 +163,24 @@ void motorPower()
     }
     if (controllerData.up * controllerData.down * controllerData.left * controllerData.right == 1)
     {
-/*         if (rightMotorPower > 0)
-        {
-            rightMotorPower -= accel / 2;
-        }
-        else if (rightMotorPower < 0)
-        {
-            rightMotorPower += accel / 2;
-        }
-        if (leftMotorPower > 0)
-        {
-            leftMotorPower -= accel / 2;
-        }
-        else if (leftMotorPower < 0)
-        {
-            leftMotorPower += accel / 2;
-        } */
-       rightMotorPower = 0;
-       leftMotorPower = 0;
+        /*         if (rightMotorPower > 0)
+                {
+                    rightMotorPower -= accel / 2;
+                }
+                else if (rightMotorPower < 0)
+                {
+                    rightMotorPower += accel / 2;
+                }
+                if (leftMotorPower > 0)
+                {
+                    leftMotorPower -= accel / 2;
+                }
+                else if (leftMotorPower < 0)
+                {
+                    leftMotorPower += accel / 2;
+                } */
+        rightMotorPower = 0;
+        leftMotorPower = 0;
     }
 
     if (rightMotorPower > maximumPower)
@@ -223,6 +224,29 @@ void motorDrive()
     }
 }
 
+void controllPower()
+{
+    if (rightMotorPower > 0)
+    {
+        rightMotorPower += 10;
+    }
+    if (rightMotorPower < 0)
+    {
+        rightMotorPower -= 10;
+    }
+}
+
+void getMode()
+{
+    if (controllerData.up == 0)
+    {
+        if (mode == 0)
+        {
+        }
+        mode = 1;
+    }
+}
+
 void setup()
 {
     analogWriteFreq(30000);
@@ -253,6 +277,7 @@ void loop()
     {
         fireBuzzer();
         motorPower(); // モーターの出力決定
+        controllPower();
         // たとえばここにimuからの値をもとにパラメーターを調整
         motorDrive(); // ここで出力
         // ここから送信用
