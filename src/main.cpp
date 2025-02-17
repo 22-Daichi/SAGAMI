@@ -136,7 +136,7 @@ void fireBuzzer()
 
 void motorPower()
 {
-    maximumPower = 165800/shipData.battery;
+    maximumPower = 165800 / shipData.battery;
     if (controllerData.up == 0)
     {
         rightMotorPower += accel;
@@ -205,23 +205,23 @@ void motorDrive()
 {
     if (rightMotorPower >= 0)
     {
-        analogWrite(rightMotor1, rightMotorPower);
-        analogWrite(rightMotor2, 0);
+        analogWrite(rightMotor2, 255 - rightMotorPower);
+        analogWrite(rightMotor1, 255);
     }
     else
     {
-        analogWrite(rightMotor1, 0);
-        analogWrite(rightMotor2, rightMotorPower * (-1));
+        analogWrite(rightMotor2, 255);
+        analogWrite(rightMotor1, 255 - rightMotorPower * (-1));
     }
     if (leftMotorPower >= 0)
     {
-        analogWrite(leftMotor1, leftMotorPower);
-        analogWrite(leftMotor2, 0);
+        analogWrite(leftMotor2, 255 - leftMotorPower);
+        analogWrite(leftMotor1, 255);
     }
     else
     {
-        analogWrite(leftMotor1, 0);
-        analogWrite(leftMotor2, leftMotorPower * (-1));
+        analogWrite(leftMotor2, 255);
+        analogWrite(leftMotor1, 255 - leftMotorPower * (-1));
     }
 }
 
@@ -280,7 +280,7 @@ void loop()
         inputData();
         fireBuzzer();
         motorPower(); // モーターの出力決定
-        controllPower();
+        // controllPower();
         // たとえばここにimuからの値をもとにパラメーターを調整
         motorDrive(); // ここで出力
         // ここから送信用
