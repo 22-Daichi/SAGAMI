@@ -102,6 +102,8 @@ void OnDataSent(uint8_t *mac_addr, uint8_t sendStatus)
         // Serial.println("Delivery fail");
         digitalWrite(redLed, 1);
         digitalWrite(blueLed, 0);
+        rightMotorPower = 0;
+        leftMotorPower = 0; // モーター出力ゼロ
         controllerData.up = 1;
         controllerData.down = 1;
         controllerData.right = 1;
@@ -139,6 +141,11 @@ void motorPower()
     maximumPower = 165800 / shipData.battery;
     if (controllerData.up == 0)
     {
+        if (rightMotorPower < 0 && leftMotorPower < 0)
+        {
+            rightMotorPower = 0;
+            leftMotorPower = 0;
+        }
         rightMotorPower += accel;
         leftMotorPower += accel; // 約3秒後に最大
     }
@@ -180,8 +187,9 @@ void motorPower()
                 {
                     leftMotorPower += accel / 2;
                 } */
-        rightMotorPower = 0;
-        leftMotorPower = 0;
+        // rightMotorPower = 0;
+        // leftMotorPower = 0;
+        // ボタンを話すと出力保持
     }
 
     if (rightMotorPower > maximumPower)
